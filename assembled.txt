@@ -1,0 +1,182 @@
+          ; 
+211E9E    ; ld hl,@prgmB_name
+EF7A41    ; bcall _Mov9ToOP1
+EFF142    ; bcall _ChkFindSym
+          ; 
+3006      ; jr nc,@was_found
+3E3F      ; ld a,Lquestion
+EF0445    ; bcall _PutC
+C9        ; ret
+          ; 
+          ; @was_found
+          ; 
+EB        ; ex de,hl
+4E        ; ld c,(hl)
+23        ; inc hl
+46        ; ld b,(hl)
+23        ; inc hl
+54        ; ld d,h
+5D        ; ld e,l
+09        ; add hl,bc
+44        ; ld b,h
+4D        ; ld c,l
+217298    ; ld hl,appBackUpScreen
+          ; 
+36BB      ; ld (hl),t2ByteTok
+23        ; inc hl
+366D      ; ld (hl),tasmCmp
+23        ; inc hl
+          ; 
+          ; @nextParse
+          ; 
+AF        ; xor a
+CD2B9E    ; call @getNextByte
+          ; 
+FEDE      ; cp tDisp
+200C      ; jr nz,@tok_End
+36EF      ; ld (hl),$EF
+23        ; inc hl
+362E      ; ld (hl),$2E
+23        ; inc hl
+3645      ; ld (hl),$45
+23        ; inc hl
+C3B99D    ; jp @nextParse
+          ; 
+          ; @tok_End
+          ; 
+FED4      ; cp tEnd
+2006      ; jr nz,@tok_dot
+36C9      ; ld (hl),$C9
+23        ; inc hl
+C3B99D    ; jp @nextParse
+          ; 
+          ; @tok_dot
+          ; 
+FE3A      ; cp tDecPt
+2015      ; jr nz,@tok_newline
+CD2B9E    ; call @getNextByte
+CD429E    ; call @getImmediate
+D5        ; push de
+ED5BEC86  ; ld de,(saveSScreen)
+FE04      ; cp tStore
+C2249E    ; jp nz,@throwSyntaxErr
+CD669E    ; call @getRegCode
+          ; 
+C3B99D    ; jp @nextParse
+          ; 
+          ; @tok_newline
+          ; 
+FE3F      ; cp tEnter
+CAB99D    ; jp z,@nextParse
+FE3E      ; cp tColon
+CAB99D    ; jp z,@nextParse
+          ; 
+C3249E    ; jp @throwSyntaxErr
+          ; 
+          ; @writeFinalPrgm
+          ; 
+E5        ; push hl
+21219E    ; ld hl,@prgmC_name
+EF7A41    ; bcall _Mov9ToOP1
+EFF142    ; bcall _ChkFindSym
+3803      ; jr c,@writeFinalPrgm_skip
+EFC64F    ; bcall _DelVarArc
+          ; 
+          ; @writeFinalPrgm_skip
+          ; 
+018E67    ; ld bc,$678E
+E1        ; pop hl
+09        ; add hl,bc
+E5        ; push hl
+          ; 
+EF6D4E    ; bcall _CreateProtProg
+13        ; inc de
+13        ; inc de
+C1        ; pop bc
+217298    ; ld hl,appBackUpScreen
+EDB0      ; ldir
+          ; 
+C9        ; ret
+          ; 
+          ; @prgmB_name
+054200    ; .db ProgObj tB 0
+          ; @prgmC_name
+064300    ; .db ProtProgObj tC 0
+          ; 
+          ; @throwSyntaxErr
+3E88      ; ld a,E_Syntax
+CD5000D744; bjump _JError
+          ; 
+          ; @getNextByte
+F5        ; push af
+          ; 
+7B        ; ld a,e
+B9        ; cp c
+200E      ; jr nz,@getNextByte_noEOF
+7A        ; ld a,d
+B8        ; cp b
+200A      ; jr nz,@getNextByte_noEOF
+          ; 
+F1        ; pop af
+33        ; inc sp
+33        ; inc sp
+          ; 
+B7        ; or a
+CAFD9D    ; jp z,@writeFinalPrgm
+C3249E    ; jp @throwSyntaxErr
+          ; 
+          ; @getNextByte_noEOF
+F1        ; pop af
+1A        ; ld a,(de)
+13        ; inc de
+C9        ; ret
+          ; 
+          ; @getImmediate
+E5        ; push hl
+210000    ; ld hl,0
+          ; @getImmediate_loop
+D630      ; sub t0
+FE09      ; cp 9
+3012      ; jr nc,@getImmediate_loopEnd
+D5        ; push de
+54        ; ld d,h
+5D        ; ld e,l
+29        ; add hl,hl
+29        ; add hl,hl
+19        ; add hl,de
+29        ; add hl,hl
+D1        ; pop de
+85        ; add a,l
+6F        ; ld l,a
+8C        ; adc a,h
+95        ; sub l
+67        ; ld h,a
+CD2B9E    ; call @getNextByte
+18E8      ; jr @getImmediate_loop
+          ; @getImmediate_loopEnd
+C630      ; add a,$30
+EB        ; ex de,hl
+22EC86    ; ld (saveSScreen),hl
+E1        ; pop hl
+C9        ; ret
+          ; 
+          ; @getRegCode
+CD2B9E    ; call @getNextByte
+D642      ; sub tB
+FE06      ; cp 6
+2002      ; jr nz,+2
+3E04      ; ld a,4
+FE0A      ; cp 10
+2002      ; jr nz,+2
+3E05      ; ld a,5
+FE11      ; cp 17
+200B      ; jr nz,@getRegCode_aSP
+CD2B9E    ; call @getNextByte
+FE53      ; cp tS
+C2249E    ; jp nz,@throwSyntaxErr
+3E03      ; ld a,3
+C9        ; ret
+          ; @getRegCode_aSP
+          ; 
+C9        ; ret
+          ; 
