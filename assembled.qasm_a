@@ -1,5 +1,5 @@
           ; 
-211E9E    ; ld hl,@prgmB_name
+211D9E    ; ld hl,@prgmB_name
 EF7A41    ; bcall _Mov9ToOP1
 EFF142    ; bcall _ChkFindSym
           ; 
@@ -30,7 +30,7 @@ EB        ; ex de,hl
           ; @nextParse
           ; 
 AF        ; xor a
-CD2B9E    ; call @getNextByte
+CD2A9E    ; call @getNextByte
           ; 
 FEDE      ; cp tDisp
 200C      ; jr nz,@tok_End
@@ -53,14 +53,14 @@ C3B99D    ; jp @nextParse
           ; @tok_dot
           ; 
 FE3A      ; cp tDecPt
-2015      ; jr nz,@tok_newline
-CD2B9E    ; call @getNextByte
-CD429E    ; call @getImmediate
-D5        ; push de
+2014      ; jr nz,@tok_newline
+CD2A9E    ; call @getNextByte
+CD419E    ; call @getImmediate
+          ; 
 ED5BEC86  ; ld de,(saveSScreen)
 FE04      ; cp tStore
-C2249E    ; jp nz,@throwSyntaxErr
-CD669E    ; call @getRegCode
+C2239E    ; jp nz,@throwSyntaxErr
+CD659E    ; call @getRegCode
           ; 
 C3B99D    ; jp @nextParse
           ; 
@@ -71,12 +71,12 @@ CAB99D    ; jp z,@nextParse
 FE3E      ; cp tColon
 CAB99D    ; jp z,@nextParse
           ; 
-C3249E    ; jp @throwSyntaxErr
+C3239E    ; jp @throwSyntaxErr
           ; 
           ; @writeFinalPrgm
           ; 
 E5        ; push hl
-21219E    ; ld hl,@prgmC_name
+21209E    ; ld hl,@prgmC_name
 EF7A41    ; bcall _Mov9ToOP1
 EFF142    ; bcall _ChkFindSym
 3803      ; jr c,@writeFinalPrgm_skip
@@ -122,8 +122,8 @@ F1        ; pop af
 33        ; inc sp
           ; 
 B7        ; or a
-CAFD9D    ; jp z,@writeFinalPrgm
-C3249E    ; jp @throwSyntaxErr
+CAFC9D    ; jp z,@writeFinalPrgm
+C3239E    ; jp @throwSyntaxErr
           ; 
           ; @getNextByte_noEOF
 F1        ; pop af
@@ -151,7 +151,7 @@ D1        ; pop de
 8C        ; adc a,h
 95        ; sub l
 67        ; ld h,a
-CD2B9E    ; call @getNextByte
+CD2A9E    ; call @getNextByte
 18E8      ; jr @getImmediate_loop
           ; @getImmediate_loopEnd
 C630      ; add a,$30
@@ -161,7 +161,7 @@ E1        ; pop hl
 C9        ; ret
           ; 
           ; @getRegCode
-CD2B9E    ; call @getNextByte
+CD2A9E    ; call @getNextByte
 D642      ; sub tB
 FE06      ; cp 6
 2002      ; jr nz,+2
@@ -171,9 +171,9 @@ FE0A      ; cp 10
 3E05      ; ld a,5
 FE11      ; cp 17
 200B      ; jr nz,@getRegCode_aSP
-CD2B9E    ; call @getNextByte
+CD2A9E    ; call @getNextByte
 FE53      ; cp tS
-C2249E    ; jp nz,@throwSyntaxErr
+C2239E    ; jp nz,@throwSyntaxErr
 3E03      ; ld a,3
 C9        ; ret
           ; @getRegCode_aSP

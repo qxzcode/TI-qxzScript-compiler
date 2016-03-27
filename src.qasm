@@ -59,7 +59,7 @@ cp tDecPt
 jr nz,@tok_newline
 call @getNextByte
 call @getImmediate
-push de
+//push de
 ld de,(saveSScreen)
 cp tStore
 jp nz,@throwSyntaxErr
@@ -181,4 +181,3 @@ ret                  //  -
 @getRegCode_aSP
 //...
 ret
-
